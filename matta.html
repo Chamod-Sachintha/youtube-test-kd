@@ -1,0 +1,72 @@
+#!/bin/bash
+
+# Get the parameters passed from PHP
+script_param=$1
+districts_param=$2
+
+echo "Script selected: $script_param"
+echo "Districts selected: $districts_param"
+
+# Define functions for each district action
+perform_colombo_actions() {
+    echo "Performing actions for Colombo..."
+    number_file="/usr/local/freeswitch/scripts/OBD/DMC_Alert/DCM_Numbers/colombo"
+
+    while IFS= read -r number; do
+        echo "DMC Call generated for Number: $number"
+        /usr/local/freeswitch/bin/fs_cli -x "jsrun $script_file $number"
+        # Add your logic for Colombo here
+    done <"$number_file"
+}
+
+# Define functions for other districts similarly
+
+# Set the script file based on the script_param
+case $script_param in
+    1)
+        echo "Running Testing script..."
+        script_file="DMC_testwarning.js"
+        ;;
+    2)
+        echo "Running Tsunami Warning script..."
+        script_file="DMC_Tsunamiwarning.js"
+        ;;
+    3)
+        echo "Running Flood Warning script..."
+        script_file="DMC_floodwarning.js"
+        ;;
+    4)
+        echo "Running Earthslip Warning script..."
+        script_file="DMC_earthslipswarning.js"
+        ;;
+    *)
+        echo "Unknown script selected..."
+        exit 1
+        ;;
+esac
+
+# Handle districts - loop through each selected district
+IFS=',' read -ra districts <<< "$districts_param"
+for district in "${districts[@]}"; do
+    echo "Processing district ID: $district"
+    
+    # Perform actions based on district ID
+    case $district in
+        1)
+            perform_colombo_actions
+            ;;
+        # Add cases for other districts similarly
+        # 2)
+        #     perform_actions_for_district_2
+        #     ;;
+        # 3)
+        #     perform_actions_for_district_3
+        #     ;;
+        *)
+            echo "Unknown district ID: $district"
+            ;;
+    esac
+done
+
+# Add more logic based on your requirements
+# ... optimize and correct this
